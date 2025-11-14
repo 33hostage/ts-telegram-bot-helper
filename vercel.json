@@ -1,0 +1,24 @@
+{
+  "functions": {
+    "api/webhook.ts": {
+      "runtime": "node18.x",
+      "memory": 1024
+    }
+  },
+  "builds": [
+    {
+      "src": "api/webhook.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/webhook",
+      "dest": "/api/webhook.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/webhook.ts"
+    }
+  ]
+}
