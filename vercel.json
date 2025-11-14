@@ -4,5 +4,12 @@
       "runtime": "@vercel/node@3.0.12",
       "memory": 1024
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/webhook",
+      "dest": "/api/webhook.ts"
+    }
+  ],
+  "outputDirectory": "./"
 }
