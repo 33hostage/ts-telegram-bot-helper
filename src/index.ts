@@ -5,9 +5,7 @@ import { devInfo } from "./data.js"
 const BOT_TOKEN = process.env.BOT_TOKEN as string
 
 if (!BOT_TOKEN) {
-	throw new Error(
-		"❌ BOT_TOKEN не найден в переменных окружения. Убедитесь, что файл .env существует."
-	)
+	console.error("❌ BOT_TOKEN не найден. Инициализация бота невозможна.")
 }
 
 export const bot = new Telegraf(BOT_TOKEN)
