@@ -25,5 +25,6 @@
     "skipLibCheck": true
     // ... остальные строгие настройки
   },
-  "include": ["src/**/*", "api/**/*"]
+  "include": ["src/**/*", "api/**/*"],
+  "exclude": ["api/**/*.js", "node_modules", "dist"]
 }
