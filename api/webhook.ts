@@ -1,15 +1,4 @@
-import { Telegraf } from "telegraf"
-import * as dotenv from "dotenv"
 import { bot } from '../src/index.js'
-
-dotenv.config()
-
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || process.env.BOT_TOKEN
-const WEBHOOK_URL = process.env.WEBHOOK_URL
-
-if (!WEBHOOK_URL || !WEBHOOK_SECRET) {
-	console.error("WEBHOOK_URL или BOT_TOKEN не найдены.")
-}
 
 export default async (req: any, res: any) => {
 	// Обработка входящего post запроса от telegram
