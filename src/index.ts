@@ -1,11 +1,8 @@
 import { Telegraf, Markup, Context as TelegrafContextBase } from "telegraf"
 import type { Update, CallbackQuery } from "telegraf/types"
 import { devInfo } from "./data.js"
-import * as dotenv from "dotenv"
 
-dotenv.config()
-
-const BOT_TOKEN = process.env.BOT_TOKEN
+const BOT_TOKEN = process.env.BOT_TOKEN as string
 
 if (!BOT_TOKEN) {
 	throw new Error(
@@ -13,7 +10,7 @@ if (!BOT_TOKEN) {
 	)
 }
 
-const bot = new Telegraf(BOT_TOKEN)
+export const bot = new Telegraf(BOT_TOKEN)
 
 const BACK_TO_MAIN = "back_to_main"
 
@@ -158,5 +155,3 @@ bot.hears(["дейлик", "кросс", "лекция", "модули", "ссы
 		)
 	}
 })
-
-export { bot }
