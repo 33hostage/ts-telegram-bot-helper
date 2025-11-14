@@ -1,0 +1,6 @@
+.env
+/node_modules
+/dist
+# Локальные файлы TypeScript/Node
+*.log
+.tsbuildinfo
