@@ -3,9 +3,9 @@ import { bot } from '../src/index.js'
 export default async (req: any, res: any) => {
 	// Обработка входящего post запроса от telegram
 	if (req.method === 'POST' && req.body) {
+		res.status(200).send('OK')
 		try {
 			await bot.handleUpdate(req.body)
-			res.status(200).send('OK')
 		} catch (e) {
 			console.error('Ошибка в Serverless-функции:', e)
 			res.status(200).send('Error processed')
