@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/webhook.ts": {
-      "runtime": "node18.x",
+      "runtime": "node@18.x",
       "memory": 1024
     }
   },
