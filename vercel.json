@@ -1,8 +1,7 @@
 {
   "functions": {
     "api/webhook.ts": {
-      "runtime": "@vercel/node@3.0.12",
-      "memory": 1024
+      "runtime": "@vercel/node"
     }
   },
   "routes": [
