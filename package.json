@@ -13,6 +13,9 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"engines": {
+		"node": "20.x"
+	},
 	"dependencies": {
 		"telegraf": "^4.16.3"
 	},
