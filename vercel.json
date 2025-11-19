@@ -1,13 +1,13 @@
 {
-  "routes": [
-    {
-      "src": "/api/webhook",
-      "dest": "/api/webhook.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/webhook.ts"
+  "functions": {
+    "api/bot.ts": {
+      "runtime": "vercel-node@20.x"
     }
-  ],
-  "outputDirectory": "./"
+  },
+  "rewrites": [
+    {
+      "source": "/api/webhook",
+      "destination": "/api/bot"
+    }
+  ]
 }

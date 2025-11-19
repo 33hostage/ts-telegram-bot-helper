@@ -1,7 +1,7 @@
 import { Telegraf, Markup, Context as TelegrafContextBase } from "telegraf"
 import type { Update, CallbackQuery } from "telegraf/types"
 
-const BOT_TOKEN = '8279788855:AAEPkRsnY_KecRnOD5UHS7VHQw7Dnx4N5cY'
+const BOT_TOKEN = process.env.BOT_TOKEN
 
 interface InfoItem {
 	title: string
