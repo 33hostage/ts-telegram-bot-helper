@@ -1,6 +1,8 @@
 import { Telegraf, Markup, Context as TelegrafContextBase } from "telegraf"
 import type { Update, CallbackQuery } from "telegraf/types"
 
+const BOT_TOKEN = '8279788855:AAEPkRsnY_KecRnOD5UHS7VHQw7Dnx4N5cY'
+
 interface InfoItem {
 	title: string
 	desc: string
@@ -86,8 +88,6 @@ export const devInfo: { [key: string]: ModuleItem } = {
 		],
 	},
 }
-
-const BOT_TOKEN = process.env.BOT_TOKEN
 
 const DUMMY_TOKEN = "DUMMY_TOKEN_FOR_TELEGHRAPH_IF_TOKEN_IS_MISSING"
 
