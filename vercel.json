@@ -1,11 +1,8 @@
 {
   "functions": {
-    "api/bot.ts": {}
-  },
-  "rewrites": [
-    {
-      "source": "/api/webhook",
-      "destination": "/api/bot"
+    "api/webhook.ts": {
+      "memory": 128,
+      "maxDuration": 10
     }
-  ]
+  }
 }
