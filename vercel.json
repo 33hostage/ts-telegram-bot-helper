@@ -1,8 +1,6 @@
 {
   "functions": {
-    "api/bot.ts": {
-      "runtime": "vercel-node@20.x"
-    }
+    "api/bot.ts": {}
   },
   "rewrites": [
     {
