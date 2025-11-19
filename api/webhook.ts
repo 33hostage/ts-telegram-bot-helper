@@ -1,17 +1,17 @@
-import { Telegraf, Markup, Context as TelegrafContextBase } from "telegraf"
-import type { Update, CallbackQuery } from "telegraf/types"
+import { Telegraf, Markup, Context as TelegrafContextBase } from "telegraf";
+import type { Update, CallbackQuery } from "telegraf/types";
 
-const BOT_TOKEN = process.env.BOT_TOKEN
+const BOT_TOKEN = process.env.BOT_TOKEN;
 
 interface InfoItem {
-	title: string
-	desc: string
-	url?: string
-	isSubMenu?: boolean
+	title: string;
+	desc: string;
+	url?: string;
+	isSubMenu?: boolean;
 }
 
 interface ModuleItem extends InfoItem {
-	modules?: { title: string; url: string }[]
+	modules?: { title: string; url: string }[];
 }
 
 export const devInfo: { [key: string]: ModuleItem } = {
@@ -87,19 +87,18 @@ export const devInfo: { [key: string]: ModuleItem } = {
 			},
 		],
 	},
-}
-
-const DUMMY_TOKEN = "DUMMY_TOKEN_FOR_TELEGHRAPH_IF_TOKEN_IS_MISSING"
+};
 
 if (!BOT_TOKEN) {
-	console.error("❌ BOT_TOKEN not found. Bot initialization is impossible.")
+	console.error("❌ BOT_TOKEN not found. Bot initialization is impossible.");
 }
 
-// Безопасная инициализация бота
-export const bot = new Telegraf(BOT_TOKEN || DUMMY_TOKEN)
+let bot: Telegraf | null = null;
 
 if (BOT_TOKEN) {
-	const BACK_TO_MAIN = "back_to_main"
+	bot = new Telegraf(BOT_TOKEN);
+
+	const BACK_TO_MAIN = "back_to_main";
 
 	const createMainMenu = () => {
 		const inlineKeyboard = Markup.inlineKeyboard(
@@ -107,142 +106,150 @@ if (BOT_TOKEN) {
 				Markup.button.callback(info.title, `info_${key}`)
 			),
 			{ columns: 2 }
-		)
-		return inlineKeyboard
-	}
+		);
+		return inlineKeyboard;
+	};
 
-	type StartCtx = TelegrafContextBase<Update.MessageUpdate>
+	type StartCtx = TelegrafContextBase<Update.MessageUpdate>;
 	type CallbackCtx = TelegrafContextBase<
 		Update.CallbackQueryUpdate<CallbackQuery>
-	>
-	type ExtraReplyMessage = Parameters<StartCtx["reply"]>[1]
+	>;
+	type ExtraReplyMessage = Parameters<StartCtx["reply"]>[1];
 
 	const getMainMessage = (firstName: string) =>
 		`👋 Привет, ${firstName}! Я информационный бот для React-разработчиков.
 
         Здесь ты найдешь все актуальные ссылки и инструкции.
 
-        **Выбери нужный раздел:**`
+        **Выбери нужный раздел:**`;
 
 	const handleStart = (ctx: StartCtx) => {
-		const firstName = ctx.from?.first_name || "друг"
-		const message = getMainMessage(firstName)
+		const firstName = ctx.from?.first_name || "друг";
+		const message = getMainMessage(firstName);
 
 		ctx.reply(message, {
 			...createMainMenu(),
 			parse_mode: "Markdown",
-		} as ExtraReplyMessage)
-	}
+		} as ExtraReplyMessage);
+	};
 
 	const handleBackToMain = async (ctx: CallbackCtx) => {
-		await ctx.answerCbQuery()
+		await ctx.answerCbQuery();
 
 		try {
-			await ctx.deleteMessage()
+			await ctx.deleteMessage();
 		} catch (e) {
-			console.warn("Не удалось удалить предыдущее сообщение.")
+			console.warn("Не удалось удалить предыдущее сообщение.");
 		}
 
-		const firstName = ctx.from?.first_name || "друг"
-		const message = getMainMessage(firstName)
+		const firstName = ctx.from?.first_name || "друг";
+		const message = getMainMessage(firstName);
 
 		await ctx.reply(message, {
 			...createMainMenu(),
 			parse_mode: "Markdown",
-		} as ExtraReplyMessage)
-	}
+		} as ExtraReplyMessage);
+	};
 
-	// Привязываем обработчики к командам
-	bot.start(handleStart)
-	bot.action(BACK_TO_MAIN, handleBackToMain)
+	if (bot) {
+		bot.start(handleStart);
+		bot.action(BACK_TO_MAIN, handleBackToMain);
 
-	Object.entries(devInfo).forEach(([key, info]) => {
-		if (info.isSubMenu && info.modules) {
-			bot.action(`info_${key}`, async ctx => {
-				await ctx.answerCbQuery()
+		Object.entries(devInfo).forEach(([key, info]) => {
+			if (info.isSubMenu && info.modules) {
+				bot!.action(`info_${key}`, async (ctx: CallbackCtx) => {
+					await ctx.answerCbQuery();
+
+					try {
+						await ctx.deleteMessage();
+					} catch (e) {
+						console.warn("Не удалось удалить сообщение раздела.");
+					}
+
+					const moduleInfo = devInfo[key];
+					const message = `**${moduleInfo.title}**\n\n${moduleInfo.desc}\n\nВыберите модуль:`;
+					const moduleButtons = moduleInfo.modules!.map((mod) =>
+						Markup.button.url(mod.title, mod.url)
+					);
+					const backButton = Markup.button.callback("↩️ Назад", BACK_TO_MAIN);
+					const moduleKeyboard = Markup.inlineKeyboard(
+						[...moduleButtons, backButton],
+						{ columns: 2 }
+					);
+
+					await ctx.reply(message, {
+						...moduleKeyboard,
+						parse_mode: "Markdown",
+					} as ExtraReplyMessage);
+				});
+				return;
+			}
+
+			bot!.action(`info_${key}`, async (ctx: CallbackCtx) => {
+				await ctx.answerCbQuery();
 
 				try {
-					await ctx.deleteMessage()
+					await ctx.deleteMessage();
 				} catch (e) {
-					console.warn("Не удалось удалить сообщение раздела.")
+					console.warn("Не удалось удалить сообщение раздела.");
 				}
 
-				const moduleInfo = devInfo[key]
-				const message = `**${moduleInfo.title}**\n\n${moduleInfo.desc}\n\nВыберите модуль:`
-				const moduleButtons = moduleInfo.modules!.map(mod =>
-					Markup.button.url(mod.title, mod.url)
-				)
-				const backButton = Markup.button.callback("↩️ Назад", BACK_TO_MAIN)
-				const moduleKeyboard = Markup.inlineKeyboard(
-					[...moduleButtons, backButton],
-					{ columns: 2 }
-				)
+				const itemInfo = devInfo[key];
+				let response = `**${itemInfo.title}**\n\n${itemInfo.desc}`;
+				if (itemInfo.url) {
+					response += `\n\n🔗 **Ссылка**: [Перейти](${itemInfo.url})`;
+				}
+				const buttons = [];
+				if (itemInfo.url) {
+					buttons.push(Markup.button.url("↗️ Перейти по ссылке", itemInfo.url));
+				}
+				buttons.push(Markup.button.callback("↩️ Назад в меню", BACK_TO_MAIN));
 
-				await ctx.reply(message, {
-					...moduleKeyboard,
+				const keyboard = Markup.inlineKeyboard(buttons, { columns: 1 });
+
+				await ctx.reply(response, {
+					...keyboard,
 					parse_mode: "Markdown",
-				} as ExtraReplyMessage)
-			})
-			return
-		}
+					disable_web_page_preview: !itemInfo.url,
+				} as ExtraReplyMessage);
+			});
+		});
 
-		bot.action(`info_${key}`, async ctx => {
-			await ctx.answerCbQuery()
-
-			try {
-				await ctx.deleteMessage()
-			} catch (e) {
-				console.warn("Не удалось удалить сообщение раздела.")
-			}
-
-			const itemInfo = devInfo[key]
-			let response = `**${itemInfo.title}**\n\n${itemInfo.desc}`
-			if (itemInfo.url) {
-				response += `\n\n🔗 **Ссылка**: [Перейти](${itemInfo.url})`
-			}
-			const buttons = []
-			if (itemInfo.url) {
-				buttons.push(Markup.button.url("↗️ Перейти по ссылке", itemInfo.url))
-			}
-			buttons.push(Markup.button.callback("↩️ Назад в меню", BACK_TO_MAIN))
-
-			const keyboard = Markup.inlineKeyboard(buttons, { columns: 1 })
-
-			await ctx.reply(response, {
-				...keyboard,
-				parse_mode: "Markdown",
-				disable_web_page_preview: !itemInfo.url,
-			} as ExtraReplyMessage)
-		})
-	})
-
-	bot.hears(["дейлик", "кросс", "лекция", "модули", "ссылки"], ctx => {
-		if (ctx.chat.type === "group" || ctx.chat.type === "supergroup") {
-			const botUsername = ctx.botInfo.username
-			ctx.reply(
-				`Привет! Всю актуальную информацию и ссылки можно получить в личном чате с ботом.
+		bot.hears(["дейлик", "кросс", "лекция", "модули", "ссылки"], (ctx) => {
+			if (ctx.chat.type === "group" || ctx.chat.type === "supergroup") {
+				const botUsername = ctx.botInfo?.username;
+				ctx.reply(
+					`Привет! Всю актуальную информацию и ссылки можно получить в личном чате с ботом.
                 
                 👉 Просто перейди ко мне в ЛС (@${botUsername}) и нажми /start.`,
-				{
-					reply_to_message_id: ctx.message.message_id,
-				} as ExtraReplyMessage
-			)
-		}
-	})
+					{
+						reply_to_message_id: ctx.message?.message_id,
+					} as ExtraReplyMessage
+				);
+			}
+		});
+	}
 }
 
 export default async (req: any, res: any) => {
-	// Обработка входящего post запроса от telegram
+	// === Проверка перед обработкой запроса ===
+	if (!bot) {
+		console.error("❌ BOT_TOKEN is missing, bot is not initialized.");
+		return res.status(500).json({ error: "Bot is not initialized." });
+	}
+
 	if (req.method === "POST" && req.body) {
-		res.status(200).send("OK")
 		try {
-			await bot.handleUpdate(req.body)
+			// === handleUpdate теперь после проверки ===
+			await bot.handleUpdate(req.body);
+			return res.status(200).send("OK");
 		} catch (e) {
-			console.error("Ошибка в Serverless-функции:", e)
+			console.error("Ошибка в Serverless-функции:", e);
+			return res.status(500).send("Internal Server Error");
 		}
 	} else if (req.method === "GET") {
-		res.status(200).send("Бот запущен и ожидает запросы")
+		return res.status(200).send("Бот запущен и ожидает запросы");
 	} else {
-		res.status(405).send("Метод не разрешен")
+		return res.status(405).send("Метод не разрешен");
 	}
-}
+};
