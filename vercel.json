@@ -3,10 +3,7 @@
     "api/webhook.ts": {
       "memory": 128,
       "maxDuration": 10,
-      "runtime": "nodejs22.x",
-      "env": {
-        "NODE_ENV": "production"
-      }
+      "runtime": "nodejs22.x"
     }
   }
 }
