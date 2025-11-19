@@ -232,7 +232,7 @@ if (BOT_TOKEN) {
 }
 
 export default async (req: any, res: any) => {
-	// === Проверка перед обработкой запроса ===
+	//  Проверка перед обработкой запроса
 	if (!bot) {
 		console.error("❌ BOT_TOKEN is missing, bot is not initialized.");
 		return res.status(500).json({ error: "Bot is not initialized." });
@@ -240,12 +240,12 @@ export default async (req: any, res: any) => {
 
 	if (req.method === "POST" && req.body) {
 		try {
-			// === handleUpdate теперь после проверки ===
-			await bot.handleUpdate(req.body);
-			return res.status(200).send("OK");
+			await bot.handleUpdate(req.body, res);
 		} catch (e) {
 			console.error("Ошибка в Serverless-функции:", e);
-			return res.status(500).send("Internal Server Error");
+			if (!res.headersSent) {
+				res.status(500).send("Internal Server Error");
+			}
 		}
 	} else if (req.method === "GET") {
 		return res.status(200).send("Бот запущен и ожидает запросы");
